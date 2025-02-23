@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,12 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-
-const formSchema = z.object({
-  model: z.string().min(1, "Model is required"),
-  resourceLink: z.string().optional(),
-  passphrase: z.string().min(1, "Passphrase is required"),
-});
+import { formSchema } from "@/shared/validate-form";
 
 export default function PageTheoForm() {
   const [isLoading, setIsLoading] = useState(false);
