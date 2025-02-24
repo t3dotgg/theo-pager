@@ -28,7 +28,6 @@ export default function PageTheoForm(props: {
     resolver: zodResolver(submitNewModelSchema),
     defaultValues: {
       model: "",
-      resourceLink: "",
     },
   });
 
@@ -69,24 +68,6 @@ export default function PageTheoForm(props: {
                 <FormLabel>Model that just dropped</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter the model name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="resourceLink"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Resource Link (Optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter resource URL"
-                    type="url"
-                    {...field}
-                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
