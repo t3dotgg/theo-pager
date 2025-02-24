@@ -3,25 +3,26 @@ import redisClient from "@/server/db/redis";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
+import AuthForm from "@/components/auth-form";
 
-async function AuthForm() {
+async function HomeContent() {
   const cookieStore = await cookies();
-  return (
-    <>
-      <h1 className="mb-8 text-4xl font-bold">Page Theo</h1>
-      <p>Theo built this so he can be paged when a new model drops.</p>
-      <form
+  const token = cookieStore.get("page-theo-token")?.value;
+
+  if (!token)
+    return (
+      <AuthForm
         action={async (formdata) => {
           "use server";
 
-          const username = formdata.get("username");
-          const password = formdata.get("password");
+          const username = formdata.username;
+          const passphrase = formdata.passphrase;
 
-          if (typeof username !== "string" || typeof password !== "string") {
+          if (typeof username !== "string" || typeof passphrase !== "string") {
             throw new Error("malformed");
           }
 
-          if (password !== process.env.PASSPHRASE) {
+          if (passphrase !== process.env.PASSPHRASE) {
             throw new Error("you aren't supposed to be here");
           }
 
@@ -34,24 +35,12 @@ async function AuthForm() {
 
           await redisClient.set(`token:${token}`, jsonified);
 
+          const cookieStore = await cookies();
           cookieStore.set("page-theo-token", token);
           revalidatePath("/fake-path");
         }}
-      >
-        <input type="text" name="username" />
-        <input type="password" name="password" />
-        <button type="submit">Authenticate</button>
-      </form>
-    </>
-  );
-}
-
-async function HomeContent() {
-  const cookieStore = await cookies();
-
-  const token = cookieStore.get("page-theo-token")?.value;
-
-  if (!token) return <AuthForm />;
+      />
+    );
 
   const dataFromKv = await redisClient.get(`token:${token}`);
   if (!dataFromKv) {
