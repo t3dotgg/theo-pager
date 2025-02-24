@@ -73,16 +73,6 @@ async function ModelPage() {
                   )}
                 </div>
               </div>
-              {model.resourceLink && (
-                <a
-                  href={model.resourceLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                >
-                  View Resource →
-                </a>
-              )}
             </div>
           ))}
           {models.length === 0 && (

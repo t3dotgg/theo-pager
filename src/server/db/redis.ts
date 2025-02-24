@@ -45,7 +45,6 @@ export async function KV__getAllSubmittedModels() {
     if (!item) throw new Error("Model not found");
     return JSON.parse(item) as {
       model: string;
-      resourceLink: string;
       submitter: string;
       submittedAt: string;
     };
