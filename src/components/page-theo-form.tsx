@@ -57,7 +57,7 @@ export default function PageTheoForm(props: {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full bg-card p-6 rounded-lg border shadow-sm"
+        // className="w-full bg-card p-6 rounded-lg border shadow-sm"
       >
         <div className="space-y-4">
           <FormField
@@ -67,7 +67,7 @@ export default function PageTheoForm(props: {
               <FormItem>
                 <FormLabel>Model that just dropped</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the model name" {...field} />
+                  <Input className="bg-card" placeholder="Enter the model name" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
