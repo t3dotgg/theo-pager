@@ -25,8 +25,9 @@ export async function KV__submitModel(
   input: z.infer<typeof submitNewModelSchema>,
   submitter: string
 ) {
+  const uniqueIdentifier = crypto.randomUUID();
   await redisClient.set(
-    `model:${input.model}:${submitter}`,
+    `model:${submitter}:${uniqueIdentifier}`,
     JSON.stringify({
       ...input,
       submitter,
@@ -40,7 +41,7 @@ export async function KV__getAllSubmittedModels() {
   if (models.length === 0) return [];
   const data = await redisClient.mget(...models);
 
-  return data.map((item) => {
+  const results = data.map((item) => {
     if (!item) throw new Error("Model not found");
     return JSON.parse(item) as {
       model: string;
@@ -49,4 +50,9 @@ export async function KV__getAllSubmittedModels() {
       submittedAt: string;
     };
   });
+
+  return results.sort(
+    (a, b) =>
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+  );
 }

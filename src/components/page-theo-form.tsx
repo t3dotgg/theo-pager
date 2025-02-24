@@ -28,6 +28,7 @@ export default function PageTheoForm(props: {
     resolver: zodResolver(submitNewModelSchema),
     defaultValues: {
       model: "",
+      resourceLink: "",
     },
   });
 
@@ -57,23 +58,43 @@ export default function PageTheoForm(props: {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-full max-w-md"
+        className="space-y-8 w-full max-w-md bg-card p-6 rounded-lg border shadow-sm"
       >
-        <FormField
-          control={form.control}
-          name="model"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Model that just dropped</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter the model name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="model"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Model that just dropped</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter the model name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit" disabled={isLoading}>
+          <FormField
+            control={form.control}
+            name="resourceLink"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Resource Link (Optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter resource URL"
+                    type="url"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? "Paging..." : "Page Theo"}
         </Button>
       </form>

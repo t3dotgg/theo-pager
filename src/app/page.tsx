@@ -27,56 +27,80 @@ async function authTokenCheck() {
   return dataFromKv;
 }
 
+async function ModelPage() {
+  const models = await KV__getAllSubmittedModels();
+  return (
+    <div className="w-full max-w-4xl mx-auto space-y-12">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Page Theo
+        </h1>
+        <p className="mt-2 text-muted-foreground">
+          Submit new model drops and Theo will be notified instantly
+        </p>
+      </div>
+
+      <PageTheoForm
+        action={async (formdata) => {
+          "use server";
+          const userData = await authTokenCheck();
+          await submitNewModelAction(formdata, userData.username);
+          revalidatePath("/fake-path");
+        }}
+      />
+
+      <div className="bg-card rounded-lg border shadow-sm p-6">
+        <h2 className="text-2xl font-semibold mb-6">Recent Submissions</h2>
+        <div className="divide-y">
+          {models.map((model) => (
+            <div
+              key={model.model}
+              className="py-4 flex items-center justify-between gap-4 group"
+            >
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium truncate">{model.model}</h3>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <span>{model.submitter}</span>
+                  {model.submittedAt && (
+                    <>
+                      <span>•</span>
+                      <span>
+                        {formatDistanceToNow(new Date(model.submittedAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+              {model.resourceLink && (
+                <a
+                  href={model.resourceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                >
+                  View Resource →
+                </a>
+              )}
+            </div>
+          ))}
+          {models.length === 0 && (
+            <p className="py-4 text-center text-muted-foreground">
+              No models submitted yet
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 async function HomeContent() {
   try {
     await authTokenCheck();
 
-    const models = await KV__getAllSubmittedModels();
-    return (
-      <>
-        <h1 className="mb-8 text-4xl font-bold">Page Theo</h1>
-        <PageTheoForm
-          action={async (formdata) => {
-            "use server";
-            const userData = await authTokenCheck();
-            await submitNewModelAction(formdata, userData.username);
-
-            // Hack to revalidate without killing caches
-            revalidatePath("/fake-path");
-          }}
-        />
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold">Submitted Models</h2>
-          <ul className="mt-4 space-y-2">
-            {models.map((model) => (
-              <li key={model.model} className="flex items-center gap-2">
-                <span className="font-medium">{model.model}</span>
-                <span className="text-sm text-gray-500">
-                  submitted by {model.submitter}
-                </span>
-                {model.submittedAt && (
-                  <span className="text-sm text-gray-400">
-                    {formatDistanceToNow(new Date(model.submittedAt), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                )}
-                {model.resourceLink && (
-                  <a
-                    href={model.resourceLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-500 hover:underline"
-                  >
-                    View Resource
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </>
-    );
+    return <ModelPage />;
   } catch (error) {
     console.error(error);
     return (
@@ -108,8 +132,12 @@ async function HomeContent() {
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <Suspense fallback={<div>Loading...</div>}>
+    <main className="min-h-screen w-full py-12 px-4 sm:px-6 md:py-16 lg:py-24">
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center">Loading...</div>
+        }
+      >
         <HomeContent />
       </Suspense>
     </main>
