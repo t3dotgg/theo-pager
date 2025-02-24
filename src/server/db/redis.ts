@@ -18,3 +18,27 @@ export async function getUserFromToken(token: string) {
 export async function setUserToken(token: string, username: string) {
   await redisClient.set(`token:${token}`, JSON.stringify({ username }));
 }
+
+export async function submitNewModel(
+  model: string,
+  resourceLink: string,
+  submitter: string
+) {
+  await redisClient.set(
+    `model:${model}`,
+    JSON.stringify({ model, resourceLink, submitter })
+  );
+}
+
+export async function getAllSubmittedModels() {
+  const models = await redisClient.keys("model:*");
+  return models.map(async (model) => {
+    const data = await redisClient.get(model);
+    if (!data) return null;
+    return JSON.parse(data) as {
+      model: string;
+      resourceLink: string;
+      submitter: string;
+    };
+  });
+}

@@ -16,41 +16,31 @@ import {
 import type { z } from "zod";
 
 import { useToast } from "@/hooks/use-toast";
-import { formSchema } from "@/shared/validate-form";
+import { submitNewModelSchema } from "@/shared/validate-form";
 
-export default function PageTheoForm() {
+export default function PageTheoForm(props: {
+  action: (values: z.infer<typeof submitNewModelSchema>) => Promise<void>;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof submitNewModelSchema>>({
+    resolver: zodResolver(submitNewModelSchema),
     defaultValues: {
       model: "",
-      passphrase: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof submitNewModelSchema>) {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/page-theo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      await props.action(values);
 
-      if (response.ok) {
-        toast({
-          title: "Success",
-          description: "Theo has been paged!",
-        });
-        form.reset();
-      } else {
-        const error = await response.text();
-        throw new Error(error);
-      }
+      toast({
+        title: "Success",
+        description: "Theo has been paged!",
+      });
+      form.reset();
     } catch (error) {
       toast({
         title: "Error",
@@ -82,23 +72,7 @@ export default function PageTheoForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="passphrase"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Passphrase</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Enter the passphrase"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
         <Button type="submit" disabled={isLoading}>
           {isLoading ? "Paging..." : "Page Theo"}
         </Button>
