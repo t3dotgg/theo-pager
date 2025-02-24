@@ -1,6 +1,7 @@
 import { submitNewModelSchema } from "@/shared/validate-form";
 import twilio from "twilio";
 import { z } from "zod";
+import { KV__submitModel } from "../db/redis";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID!;
 const authToken = process.env.TWILIO_AUTH_TOKEN!;
@@ -15,9 +16,11 @@ export async function submitNewModelAction(
 ) {
   console.log("[SUBMISSION]", input, submitter);
 
+  await KV__submitModel(input, submitter);
+
   const twiml = new twilio.twiml.VoiceResponse();
   twiml.say(
-    `New model alert! ${input.model} just dropped. Submitted by ${submitter}. Check out ${input.resourceLink} for more information.`
+    `New model alert! ${input.model} just dropped. Submitted by ${submitter}.`
   );
 
   try {
