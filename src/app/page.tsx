@@ -11,6 +11,7 @@ import AuthForm from "@/components/auth-form";
 import { authSchema } from "@/shared/validate-form";
 import { submitNewModelAction } from "@/server/actions/submit-new-model";
 import { formatDistanceToNow } from "date-fns";
+import { tryCatch } from "@/shared/trycatch";
 
 async function authTokenCheck() {
   const cookieStore = await cookies();
@@ -89,12 +90,9 @@ async function ModelPage() {
 }
 
 async function HomeContent() {
-  try {
-    await authTokenCheck();
+  const { data, error } = await tryCatch(authTokenCheck());
 
-    return <ModelPage />;
-  } catch (error) {
-    console.error(error);
+  if (error || !data) {
     return (
       <AuthForm
         action={async (formdata) => {
@@ -120,6 +118,8 @@ async function HomeContent() {
       />
     );
   }
+
+  return <ModelPage />;
 }
 
 export default function Home() {
