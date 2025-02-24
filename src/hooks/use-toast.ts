@@ -1,5 +1,8 @@
 "use client";
 
+// Note from Theo:
+// I would never have used this, but V0 chose to. Will gut for Sonner eventualy.
+
 // Inspired by react-hot-toast library
 import * as React from "react";
 
