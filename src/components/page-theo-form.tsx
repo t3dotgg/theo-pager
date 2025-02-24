@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import type { z } from "zod";
+
 import { useToast } from "@/hooks/use-toast";
 import { formSchema } from "@/shared/validate-form";
 
@@ -24,7 +26,6 @@ export default function PageTheoForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       model: "",
-      resourceLink: "",
       passphrase: "",
     },
   });
@@ -76,19 +77,6 @@ export default function PageTheoForm() {
               <FormLabel>Model that just dropped</FormLabel>
               <FormControl>
                 <Input placeholder="Enter the model name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="resourceLink"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Resource Link</FormLabel>
-              <FormControl>
-                <Input placeholder="https://example.com/resource" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
