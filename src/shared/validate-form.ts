@@ -5,3 +5,8 @@ export const formSchema = z.object({
   resourceLink: z.string().optional(),
   passphrase: z.string().min(1, "Passphrase is required"),
 });
+
+export const authSchema = z.object({
+  username: z.string(),
+  passphrase: z.string(),
+});

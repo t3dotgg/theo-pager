@@ -1,49 +1,39 @@
 import PageTheoForm from "@/components/page-theo-form";
-import redisClient from "@/server/db/redis";
+import { getUserFromToken, setUserToken } from "@/server/db/redis";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import AuthForm from "@/components/auth-form";
+import { z } from "zod";
+import { authSchema } from "@/shared/validate-form";
+
+async function authFunction(formdata: z.infer<typeof authSchema>) {
+  "use server";
+
+  const { username, passphrase } = authSchema.parse(formdata);
+
+  if (passphrase !== process.env.PASSPHRASE) {
+    throw new Error("you aren't supposed to be here");
+  }
+
+  // User is authenticated, we can create and store a cookie now
+  const token = crypto.randomUUID();
+
+  await setUserToken(token, username);
+
+  const cookieStore = await cookies();
+  cookieStore.set("page-theo-token", token);
+  revalidatePath("/fake-path");
+}
 
 async function HomeContent() {
   const cookieStore = await cookies();
   const token = cookieStore.get("page-theo-token")?.value;
 
-  if (!token)
-    return (
-      <AuthForm
-        action={async (formdata) => {
-          "use server";
+  if (!token) return <AuthForm action={authFunction} />;
 
-          const username = formdata.username;
-          const passphrase = formdata.passphrase;
-
-          if (typeof username !== "string" || typeof passphrase !== "string") {
-            throw new Error("malformed");
-          }
-
-          if (passphrase !== process.env.PASSPHRASE) {
-            throw new Error("you aren't supposed to be here");
-          }
-
-          // User is authenticated, we can create and store a cookie now
-          const token = crypto.randomUUID();
-
-          const jsonified = JSON.stringify({
-            username,
-          });
-
-          await redisClient.set(`token:${token}`, jsonified);
-
-          const cookieStore = await cookies();
-          cookieStore.set("page-theo-token", token);
-          revalidatePath("/fake-path");
-        }}
-      />
-    );
-
-  const dataFromKv = await redisClient.get(`token:${token}`);
-  if (!dataFromKv) {
+  const dataFromKv = await getUserFromToken(token);
+  if (!dataFromKv || !dataFromKv.username) {
     return <p>Invalid token</p>;
   }
 

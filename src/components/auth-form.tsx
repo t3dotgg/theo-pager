@@ -13,11 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
-
-const authSchema = z.object({
-  username: z.string(),
-  passphrase: z.string(),
-});
+import { authSchema } from "@/shared/validate-form";
 
 export default function AuthForm(props: {
   action: (values: z.infer<typeof authSchema>) => Promise<void>;
