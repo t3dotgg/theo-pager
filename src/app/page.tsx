@@ -30,56 +30,58 @@ async function authTokenCheck() {
 async function ModelPage() {
   const models = await KV__getAllSubmittedModels();
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-12">
-      <div className="text-center">
+    <div className="w-full max-w-2xl mx-auto space-y-8">
+      <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           Page Theo
         </h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="text-muted-foreground">
           Submit new model drops and Theo will be notified instantly
         </p>
       </div>
 
-      <PageTheoForm
-        action={async (formdata) => {
-          "use server";
-          const userData = await authTokenCheck();
-          await submitNewModelAction(formdata, userData.username);
-          revalidatePath("/fake-path");
-        }}
-      />
+      <div className="grid gap-8">
+        <PageTheoForm
+          action={async (formdata) => {
+            "use server";
+            const userData = await authTokenCheck();
+            await submitNewModelAction(formdata, userData.username);
+            revalidatePath("/fake-path");
+          }}
+        />
 
-      <div className="bg-card rounded-lg border shadow-sm p-6">
-        <h2 className="text-2xl font-semibold mb-6">Recent Submissions</h2>
-        <div className="divide-y">
-          {models.map((model) => (
-            <div
-              key={model.model}
-              className="py-4 flex items-center justify-between gap-4 group"
-            >
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium truncate">{model.model}</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                  <span>{model.submitter}</span>
-                  {model.submittedAt && (
-                    <>
-                      <span>•</span>
-                      <span>
-                        {formatDistanceToNow(new Date(model.submittedAt), {
-                          addSuffix: true,
-                        })}
-                      </span>
-                    </>
-                  )}
+        <div className="bg-card rounded-lg border shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-6">Recent Submissions</h2>
+          <div className="divide-y">
+            {models.map((model) => (
+              <div
+                key={model.model}
+                className="py-4 flex items-center justify-between gap-4 group"
+              >
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium truncate">{model.model}</h3>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                    <span>{model.submitter}</span>
+                    {model.submittedAt && (
+                      <>
+                        <span>•</span>
+                        <span>
+                          {formatDistanceToNow(new Date(model.submittedAt), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          {models.length === 0 && (
-            <p className="py-4 text-center text-muted-foreground">
-              No models submitted yet
-            </p>
-          )}
+            ))}
+            {models.length === 0 && (
+              <p className="py-4 text-center text-muted-foreground">
+                No models submitted yet
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -57,7 +57,7 @@ export default function PageTheoForm(props: {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-full max-w-md bg-card p-6 rounded-lg border shadow-sm"
+        className="w-full bg-card p-6 rounded-lg border shadow-sm"
       >
         <div className="space-y-4">
           <FormField
@@ -75,7 +75,7 @@ export default function PageTheoForm(props: {
           />
         </div>
 
-        <Button type="submit" disabled={isLoading} className="w-full">
+        <Button type="submit" disabled={isLoading} className="w-full mt-6">
           {isLoading ? "Paging..." : "Page Theo"}
         </Button>
       </form>
